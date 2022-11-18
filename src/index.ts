@@ -225,11 +225,17 @@ app.get(
           username: currentusername,
         },
       });
-      const conta: number = usuariologado[0].accounts.id;
+      const conta: any = usuariologado[0].accounts.id;
 
-      const extrato = await myDataSource.getMongoRepository(Transactions).find({
-        where: [{ creditedAccountId: conta }, { debitedAccountId: conta }],
-      });
+      const extrato = await myDataSource.getRepository(Transactions)
+      .createQueryBuilder("transactions")
+     .leftJoinAndSelect("transactions.creditedAccountId", "creditedAccountId")
+     .leftJoinAndSelect("transactions.debitedAccountId", "debitedAccountId")
+     .where("transactions.creditedAccountId = :creditedAccountId", { creditedAccountId: 1 })
+     .orWhere("transactions.debitedAccountId = :debitedAccountId", { debitedAccountId: 1})   
+     .getMany()
+
+
       return res.json(extrato);
     } catch (error) {
       console.log(error);
@@ -237,6 +243,38 @@ app.get(
   }
 );
 
+
+// ++++++++++++++++++++++++++++++ Filter ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+app.get(
+  "/filter",
+  isAuth,
+  attachCurrentUser,
+  async function (req: any, res: Response) {
+    try {
+      const currentusername = req.currentUser;
+      const usuariologado = await myDataSource.getRepository(User).find({
+        relations: {
+          accounts: true,
+        },
+        where: {
+          username: currentusername,
+        },
+      });
+      const conta: any = usuariologado[0].accounts.id;
+
+      const extrato = await myDataSource.getRepository(Transactions)
+       .createQueryBuilder("transactions")
+      .leftJoinAndSelect("transactions.creditedAccountId", "creditedAccountId")
+      .where("transactions.creditedAccountId = :creditedAccountId", { creditedAccountId: conta })
+      .getMany()
+
+      return res.json(extrato);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
 // +++++++++++++++++++++++++++++ GET ALL USERS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 app.get("/", async function (req: Request, res: Response) {
   /*  const users = await myDataSource.getRepository(User).find({
