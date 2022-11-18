@@ -1,3 +1,4 @@
+import { timeStamp } from "console";
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -5,6 +6,7 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  Timestamp,
 } from "typeorm";
 import { Accounts } from "./Accounts";
 
@@ -25,6 +27,6 @@ export class Transactions {
   @Column()
   value: number;
 
-  @CreateDateColumn()
+  @CreateDateColumn({type: "date"})
   createdAt: Date;
 }
