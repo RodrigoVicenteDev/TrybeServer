@@ -185,22 +185,15 @@ app.put(
         .where("id = :id", { id: debito })
         .execute();
 
-      const transacao:any = new Transactions()
-      transacao.creditedAccountId = contacredor
-      transacao.debitedAccountId = debito
-      transacao.value = valor
-      await myDataSource.manager.save(transacao)
-      
-      
-      
-      /* = await myDataSource
+      const transacao: any = new Transactions();
+      transacao.creditedAccountId = contacredor;
+      transacao.debitedAccountId = debito;
+      transacao.value = valor;
+      await myDataSource.manager.save(transacao);
+
+      const savetransaction = await myDataSource
         .getRepository(Transactions)
-        .create({
-          creditedAccountId: contacredor,
-          debitedAccountId: debito,
-          value: valor,
-        }) */
-        const savetransaction = await myDataSource.getRepository(Transactions).save(transacao)
+        .save(transacao);
       const resposta = {
         debito: debito,
         credito: credor,
@@ -212,6 +205,34 @@ app.put(
     } catch (error) {
       console.log(error);
       return res.json("usuario nao encontrado");
+    }
+  }
+);
+// +++++++++++++++++++++++++++++++++ Extrato ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+app.get(
+  "/extrato",
+  isAuth,
+  attachCurrentUser,
+  async function (req: any, res: Response) {
+    try {
+      const currentusername = req.currentUser;
+      const usuariologado = await myDataSource.getRepository(User).find({
+        relations: {
+          accounts: true,
+        },
+        where: {
+          username: currentusername,
+        },
+      });
+      const conta: number = usuariologado[0].accounts.id;
+
+      const extrato = await myDataSource.getMongoRepository(Transactions).find({
+        where: [{ creditedAccountId: conta }, { debitedAccountId: conta }],
+      });
+      return res.json(extrato);
+    } catch (error) {
+      console.log(error);
     }
   }
 );
