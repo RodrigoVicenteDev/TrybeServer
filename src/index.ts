@@ -6,6 +6,7 @@ import { Accounts } from "./entity/Accounts";
 import { Transactions } from "./entity/Transactions";
 import isAuth from "../src/midlewere/isAuth";
 import attachCurrentUser from "./midlewere/attachCurrentUser";
+import { OutgoingMessage } from "http";
 
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -288,20 +289,174 @@ app.get(
     }
   }
 );
+
+
+
+// ===============================================Rotas de Filtros ========================================================
+
+// +++++++++++++++++++++++++++++ a credito + data  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+app.get("/search/credit", isAuth, attachCurrentUser, async function (req: any, res: Response){
+
+
+try {
+  const {data} = req.query
+  const currentusername = req.currentUser;
+  const usuariologado = await myDataSource.getRepository(User).find({
+    relations: {
+      accounts: true,
+    },
+    where: {
+      username: currentusername,
+    },
+  });
+  const conta: any = usuariologado[0].accounts.id;
+
+  const extrato = await myDataSource
+    .getRepository(Transactions)
+    .createQueryBuilder("transactions")
+    .leftJoinAndSelect(
+      "transactions.creditedAccountId",
+      "creditedAccountId"
+    )
+    .leftJoinAndSelect("transactions.debitedAccountId", "debitedAccountId")
+    .where("transactions.creditedAccountId = :creditedAccountId", {
+      creditedAccountId: conta,
+    })
+    .orWhere("transactions.debitedAccountId = :debitedAccountId", {
+      debitedAccountId: conta,
+    })
+    
+    .andWhere("transactions.createdAt = :createdAt,",{createdAt:data})
+    .getMany();
+
+
+    const resposta =  extrato.filter((element) => {
+                              return (
+                                element.creditedAccountId[0].id.includes(conta) 
+                                
+                               
+                              );
+                            })
+
+  return res.json(resposta)
+} catch (error) {
+  console.log(error)
+}
+})
+// +++++++++++++++++++++++++++++ a debito + data  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+app.get("/search/debit", isAuth, attachCurrentUser,async function (req: any, res: Response){
+
+try {
+  const currentusername = req.currentUser;
+  const usuariologado = await myDataSource.getRepository(User).find({
+    relations: {
+      accounts: true,
+    },
+    where: {
+      username: currentusername,
+    },
+  });
+  const conta: any = usuariologado[0].accounts.id;
+
+  const extrato = await myDataSource
+    .getRepository(Transactions)
+    .createQueryBuilder("transactions")
+    .leftJoinAndSelect(
+      "transactions.creditedAccountId",
+      "creditedAccountId"
+    )
+    .leftJoinAndSelect("transactions.debitedAccountId", "debitedAccountId")
+    .where("transactions.creditedAccountId = :creditedAccountId", {
+      creditedAccountId: conta,
+    })
+    .orWhere("transactions.debitedAccountId = :debitedAccountId", {
+      debitedAccountId: conta,
+    })
+    .getMany();
+} catch (error) {
+  console.log(error)
+}
+})
+// +++++++++++++++++++++++++++++ por data  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+app.get("/search/allbydate", isAuth, attachCurrentUser,async function (req: any, res: Response){
+
+try {
+  const currentusername = req.currentUser;
+  const usuariologado = await myDataSource.getRepository(User).find({
+    relations: {
+      accounts: true,
+    },
+    where: {
+      username: currentusername,
+    },
+  });
+  const conta: any = usuariologado[0].accounts.id;
+
+  const extrato = await myDataSource
+    .getRepository(Transactions)
+    .createQueryBuilder("transactions")
+    .leftJoinAndSelect(
+      "transactions.creditedAccountId",
+      "creditedAccountId"
+    )
+    .leftJoinAndSelect("transactions.debitedAccountId", "debitedAccountId")
+    .where("transactions.creditedAccountId = :creditedAccountId", {
+      creditedAccountId: conta,
+    })
+    .orWhere("transactions.debitedAccountId = :debitedAccountId", {
+      debitedAccountId: conta,
+    })
+    .getMany();
+} catch (error) {
+  console.log(error)
+}
+
+
+})
+
 // +++++++++++++++++++++++++++++ GET ALL USERS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-app.get("/", async function (req: Request, res: Response) {
+
+
+
+
+
+
+app.get("/search/credit", async function (req: Request, res: Response) {
   try {
-    const extrato = await myDataSource
+
+    const { data , saida , entrada} = req.query
+    const resposta = []
+
+    if(data){
+
+      resposta.push(data)
+    }
+    if(saida){
+      resposta.push(saida)
+    }
+
+    if(entrada){
+      resposta.push(saida)
+    }
+    const extrato :any = {
+      data : data,
+      out : saida,
+      in : entrada
+    }
+    
+    
+    
+    
+/*     = await myDataSource
       .getRepository(Transactions)
       .createQueryBuilder("transactions")
       .orderBy("transactions.createdAt")
-      /* .select(
-        `TO_CHAR("transactions"."eatedAt"::timestamp , 'DD/MM/YYYY' ) as createTime`
-      ) */
+    
       .leftJoinAndSelect("transactions.creditedAccountId", "creditedAccountId")
       .getMany();
-
-    return res.json(extrato);
+ */
+    return res.json(resposta);
   } catch (error) {
     console.log(error);
   }
