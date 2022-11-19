@@ -5,21 +5,29 @@ Esta API foi construída em um servidor NODE.js com Express, utiliza o Banco de 
 
 Documentações:
 https://nodejs.org/en/docs/
+
 https://expressjs.com/
+
 https://www.postgresql.org/docs/
+
 https://typeorm.io/
+
 
 ## EndPoints
 
 ### Rota de Sigin
 |Verbo| Endpoint |Descrição
+
 |--|--|--|--|
+
 |POST  |/sigin  |Recebe usuário com no mínimo 3 caracteres e não permite usuários iguais(unique) - Recebe password com no mínimo 8 caracteres, sendo obrigatório ao menos uma maiúscula, um número e um carácter especial e devolve uma senha hasheada e uma conta com saldo de 100
 
 ### Rota de Login
 
 |Verbo| Endpoint |Descrição
+
 |--|--|--|--|
+
 |POST  |/login  |Recebe usuário  - Recebe password  e devolve um Token JWT com validade de 24h
 
 
