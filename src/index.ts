@@ -50,10 +50,8 @@ app.post("/sigin", async function (req: Request, res: Response) {
       .create({ ...req.body, password: passwordHash });
 
     const saveuser = await myDataSource.getRepository(User).save(user);
-    
 
     if (user.username) {
-      
       const account = await myDataSource
         .getRepository(Accounts)
         .create({ balance: 100 });
@@ -69,7 +67,7 @@ app.post("/sigin", async function (req: Request, res: Response) {
     }
   } catch (error) {
     console.log(error);
-    return res.json("Nome de usuario ja cadastrado")
+    return res.json("Nome de usuario ja cadastrado");
   }
 });
 
@@ -251,44 +249,6 @@ app.get(
   }
 );
 
-// ++++++++++++++++++++++++++++++ Filter ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-app.get(
-  "/filter",
-  isAuth,
-  attachCurrentUser,
-  async function (req: any, res: Response) {
-    try {
-      const currentusername = req.currentUser;
-      const usuariologado = await myDataSource.getRepository(User).find({
-        relations: {
-          accounts: true,
-        },
-        where: {
-          username: currentusername,
-        },
-      });
-      const conta: any = usuariologado[0].accounts.id;
-
-      const extrato = await myDataSource
-        .getRepository(Transactions)
-        .createQueryBuilder("transactions")
-        .orderBy("createdAt")
-        .leftJoinAndSelect(
-          "transactions.creditedAccountId",
-          "creditedAccountId"
-        )
-        .where("transactions.creditedAccountId = :creditedAccountId", {
-          creditedAccountId: conta,
-        })
-        .getMany();
-
-      return res.json(extrato);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-);
 
 // +++++++++++++++++++++++++++++ Filter ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 app.get(
@@ -309,7 +269,7 @@ app.get(
       if (data != "NaN-NaN-NaN") {
         existdata = "true";
       }
-      
+
       const currentusername = req.currentUser;
       const usuariologado = await myDataSource.getRepository(User).find({
         relations: {
@@ -350,7 +310,6 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-         
           return element.creditedAccountId.id === conta;
         });
       }
@@ -364,7 +323,6 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-         
           return element.debitedAccountId.id === conta;
         });
       }
@@ -378,7 +336,6 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-         
           return comparedate === data;
         });
       }
@@ -393,7 +350,6 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-         
           return comparedate === data && element.creditedAccountId.id === conta;
         });
       }
@@ -408,7 +364,6 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-        
           return comparedate === data && element.debitedAccountId.id === conta;
         });
       }
