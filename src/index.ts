@@ -50,7 +50,7 @@ app.post("/sigin", async function (req: Request, res: Response) {
       .create({ ...req.body, password: passwordHash });
 
     const saveuser = await myDataSource.getRepository(User).save(user);
-    console.log(saveuser);
+    
 
     if (user.username) {
       
@@ -309,7 +309,7 @@ app.get(
       if (data != "NaN-NaN-NaN") {
         existdata = "true";
       }
-      console.log(data);
+      
       const currentusername = req.currentUser;
       const usuariologado = await myDataSource.getRepository(User).find({
         relations: {
@@ -350,9 +350,7 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-          console.log(element.creditedAccountId.id === conta);
-          console.log(comparedate);
-          console.log("somente creditos");
+         
           return element.creditedAccountId.id === conta;
         });
       }
@@ -366,9 +364,7 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-          console.log(element.debitedAccountId.id === conta);
-          console.log(comparedate);
-          console.log("somente debitos");
+         
           return element.debitedAccountId.id === conta;
         });
       }
@@ -382,9 +378,7 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-          console.log(element.creditedAccountId.id === conta);
-          console.log(comparedate);
-          console.log("somente por data");
+         
           return comparedate === data;
         });
       }
@@ -399,9 +393,7 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-          console.log(element.creditedAccountId.id === conta);
-          console.log(comparedate);
-          console.log("data e credito");
+         
           return comparedate === data && element.creditedAccountId.id === conta;
         });
       }
@@ -416,9 +408,7 @@ app.get(
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
-          console.log(element.creditedAccountId.id === conta);
-          console.log(comparedate);
-          console.log("data e debito");
+        
           return comparedate === data && element.debitedAccountId.id === conta;
         });
       }
