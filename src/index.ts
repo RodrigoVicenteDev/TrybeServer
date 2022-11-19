@@ -53,7 +53,7 @@ app.post("/sigin", async function (req: Request, res: Response) {
     console.log(saveuser);
 
     if (user.username) {
-      console.log("entrou");
+      
       const account = await myDataSource
         .getRepository(Accounts)
         .create({ balance: 100 });
@@ -69,6 +69,7 @@ app.post("/sigin", async function (req: Request, res: Response) {
     }
   } catch (error) {
     console.log(error);
+    return res.json("Nome de usuario ja cadastrado")
   }
 });
 
