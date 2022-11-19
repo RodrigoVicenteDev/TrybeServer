@@ -289,8 +289,6 @@ app.get(
   }
 );
 
-
-
 // +++++++++++++++++++++++++++++ Filter ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 app.get(
   "/search/",
@@ -305,12 +303,12 @@ app.get(
       let mm = newdata.getMonth();
       let yyy = newdata.getFullYear();
       let data = `${yyy}-${mm + 1}-${dd + 1}`;
-      let existdata = ""
-      
-      if(data != "NaN-NaN-NaN" ){
-        existdata = "true"
+      let existdata = "";
+
+      if (data != "NaN-NaN-NaN") {
+        existdata = "true";
       }
-      console.log( data);
+      console.log(data);
       const currentusername = req.currentUser;
       const usuariologado = await myDataSource.getRepository(User).find({
         relations: {
@@ -342,29 +340,37 @@ app.get(
 
       let resposta = [];
 
-// somente creditos
-if ( data === "NaN-NaN-NaN" && credito === "true" && typeof debito === "undefined") {
-  resposta = extrato.filter((element) => {
-    let comparedate = String(element.createdAt);
+      // somente creditos
+      if (
+        data === "NaN-NaN-NaN" &&
+        credito === "true" &&
+        typeof debito === "undefined"
+      ) {
+        resposta = extrato.filter((element) => {
+          let comparedate = String(element.createdAt);
 
-    console.log(element.creditedAccountId.id === conta);
-    console.log(comparedate);
-    console.log("somente creditos");
-    return  element.creditedAccountId.id === conta;
-  });
-}
+          console.log(element.creditedAccountId.id === conta);
+          console.log(comparedate);
+          console.log("somente creditos");
+          return element.creditedAccountId.id === conta;
+        });
+      }
 
-// somente debitos
-if ( data === "NaN-NaN-NaN" && typeof credito === "undefined" &&  debito === "true") {
-  resposta = extrato.filter((element) => {
-    let comparedate = String(element.createdAt);
+      // somente debitos
+      if (
+        data === "NaN-NaN-NaN" &&
+        typeof credito === "undefined" &&
+        debito === "true"
+      ) {
+        resposta = extrato.filter((element) => {
+          let comparedate = String(element.createdAt);
 
-    console.log(element.debitedAccountId.id === conta);
-    console.log(comparedate);
-    console.log("somente debitos");
-    return  element.debitedAccountId.id === conta;
-  });
-}
+          console.log(element.debitedAccountId.id === conta);
+          console.log(comparedate);
+          console.log("somente debitos");
+          return element.debitedAccountId.id === conta;
+        });
+      }
 
       // Somente por data
       if (
@@ -384,7 +390,11 @@ if ( data === "NaN-NaN-NaN" && typeof credito === "undefined" &&  debito === "tr
 
       // data e credito
 
-      if (existdata === "true" && credito === "true" && typeof debito === "undefined") {
+      if (
+        existdata === "true" &&
+        credito === "true" &&
+        typeof debito === "undefined"
+      ) {
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
@@ -397,7 +407,11 @@ if ( data === "NaN-NaN-NaN" && typeof credito === "undefined" &&  debito === "tr
 
       // data e debito
 
-      if (existdata === "true" && typeof credito === "undefined" && debito === "true") {
+      if (
+        existdata === "true" &&
+        typeof credito === "undefined" &&
+        debito === "true"
+      ) {
         resposta = extrato.filter((element) => {
           let comparedate = String(element.createdAt);
 
@@ -408,47 +422,12 @@ if ( data === "NaN-NaN-NaN" && typeof credito === "undefined" &&  debito === "tr
         });
       }
 
-
       return res.json(resposta);
     } catch (error) {
       console.log(error);
     }
   }
 );
-
-// +++++++++++++++++++++++++++++ GET ALL USERS ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-app.get("/teste", async function (req: Request, res: Response) {
-  try {
-    const resposta = await myDataSource
-      .getRepository(Transactions)
-      .find({ relations: { creditedAccountId: true, debitedAccountId: true } });
-
-    /*     = await myDataSource
-      .getRepository(Transactions)
-      .createQueryBuilder("transactions")
-      .orderBy("transactions.createdAt")
-    
-      .leftJoinAndSelect("transactions.creditedAccountId", "creditedAccountId")
-      .getMany();
- */
-    return res.json(resposta);
-  } catch (error) {
-    console.log(error);
-  }
-
-  /*  const users = await myDataSource.getRepository(User).find({
-    relations: {
-      accounts: true,
-    },
-  }); */
-  /* const teste = await myDataSource
-  .getRepository(User)
-  .createQueryBuilder()
-  .where( { id: 1 })
-  .addSelect("User.password")
-  .getOne() */
-});
 
 myDataSource
   .initialize()
