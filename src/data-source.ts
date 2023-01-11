@@ -7,11 +7,11 @@ require("dotenv").config();
 
 const AppDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
-    port: 5433,
+    host: "postgres",
+    port: 5432,
     username: "postgres",
-    password: `${process.env.DB_PASSWORD}`,
-    database: "TribeDb",
+    password: `${process.env.POSTGRES_PASSWORD}`,
+    database: "postgres",
     synchronize: true,
     logging: false,
     entities: [User , Accounts, Transactions],

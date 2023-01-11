@@ -300,6 +300,7 @@ app.get(
         .getMany();
 
       let resposta = [];
+      console.log("narota")
 
       // somente creditos
       if (
@@ -374,6 +375,26 @@ app.get(
     }
   }
 );
+
+//=======================================================GET all Users===========================================
+
+app.get("/", async function (req: any, res: Response) {
+    try {
+    
+      const all = await myDataSource.getRepository(User).find({
+        relations: {
+          accounts: true,
+        },
+       
+      });
+
+      return res.status(200).json(all);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+);
+
 
 myDataSource
   .initialize()
